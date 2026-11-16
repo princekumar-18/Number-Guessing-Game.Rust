@@ -1,130 +1,62 @@
-// Number Guessing Challenge
-// Created by: Prince
+Number Guessing Challenge
 
-use std::io::{self, Write};
-use std::time::{SystemTime, UNIX_EPOCH};
+Created by: Prince
+Language: Rust
 
-fn read_int(prompt: &str) -> i64 {
-    loop {
-        print!("{prompt}");
-        io::stdout().flush().unwrap();
+About the Project
 
-        let mut line = String::new();
-        if io::stdin().read_line(&mut line).is_err() {
-            continue;
-        }
+Number Guessing Challenge is a simple, interactive command-line game developed using the Rust programming language. The objective of the game is to guess a randomly generated secret number within a limited number of attempts.
 
-        match line.trim().parse::<i64>() {
-            Ok(value) => return value,
-            Err(_) => println!("Please enter a whole number."),
-        }
-    }
-}
+At the beginning of each round, players can choose from different difficulty levels or create their own custom game settings. After every incorrect guess, the game provides helpful hints, telling players whether their guess is too high or too low and how close they are to the secret number.
 
-fn random_inclusive(low: i64, high: i64) -> i64 {
-    // Small standard-library pseudo-random generator.
-    let time = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap()
-        .as_nanos() as u64;
+This project demonstrates fundamental Rust programming concepts, including functions, loops, conditional statements, vectors, user input handling, and basic pseudo-random number generation.
 
-    let mut x = time ^ (low as u64).rotate_left(17) ^ (high as u64).rotate_left(31);
-    x ^= x << 13;
-    x ^= x >> 7;
-    x ^= x << 17;
+✨ Features
 
-    low + (x % ((high - low + 1) as u64)) as i64
-}
+Multiple Difficulty Levels: Choose between Easy, Medium, and Hard modes.
+Custom Mode: Set your own number range and number of allowed guesses.
+Smart Hints: Get feedback such as "Too high", "Too low", "Hot", "Very hot", or "Cold".
+Input Validation: Handles invalid inputs and ensures guesses stay within the selected range.
+No Repeated Guesses: Prevents players from entering the same number more than once.
+Quit Anytime: Enter -9999 to exit the current round.
+Play Again: Start a new round without restarting the program.
 
-fn main() {
-    println!("=== Number Guessing Challenge ===");
 
-    loop {
-        println!("\nDifficulty: 1) Easy  2) Medium  3) Hard  4) Custom");
-        let choice = read_int("> ");
+🎮 Difficulty Levels
 
-        let (mut low, mut high, mut attempts) = match choice {
-            1 => (1, 50, 10),
-            3 => (1, 500, 10),
-            4 => {
-                let low = read_int("Lowest possible number: ");
-                let high = loop {
-                    let value = read_int("Highest possible number: ");
-                    if value > low {
-                        break value;
-                    }
-                    println!("Must be greater than the lowest number.");
-                };
-                let attempts = loop {
-                    let value = read_int("Number of guesses (1-100): ");
-                    if (1..=100).contains(&value) {
-                        break value;
-                    }
-                    println!("Choose between 1 and 100.");
-                };
-                (low, high, attempts)
-            }
-            _ => (1, 100, 8),
-        };
+Level	Number Range	Attempts
 
-        // Keep the values mutable-free after setup.
-        let secret = random_inclusive(low, high);
-        let mut history: Vec<i64> = Vec::new();
-        let mut won = false;
+Easy	1–50	10
 
-        println!("Guess from {low} to {high}. You have {attempts} guesses.");
+Medium	1–100	8
 
-        let mut turn = 1;
-        while turn <= attempts {
-            let guess = read_int(&format!("Guess {turn}/{attempts} (-9999 to quit): "));
+Hard	1–500	10
 
-            if guess == -9999 {
-                break;
-            }
-            if guess < low || guess > high {
-                println!("Stay within the range.");
-                continue;
-            }
-            if history.contains(&guess) {
-                println!("You already tried that number.");
-                continue;
-            }
+Custom	User-defined	1–100
 
-            history.push(guess);
 
-            if guess == secret {
-                println!("Correct! You won in {turn} guesses.");
-                won = true;
-                break;
-            }
+🛠️ Requirements
 
-            let distance = (secret - guess).abs();
-            let temperature = if distance <= 3 {
-                "very hot"
-            } else if distance <= 10 {
-                "hot"
-            } else {
-                "cold"
-            };
-            let direction = if guess < secret { "Too low" } else { "Too high" };
-            println!("{direction} and {temperature}.");
+Rust programming language
+Cargo (Rust package manager)
 
-            turn += 1;
-        }
 
-        if !won {
-            println!("The number was {secret}.");
-        }
 
-        print!("Play again? (y/n): ");
-        io::stdout().flush().unwrap();
-        let mut answer = String::new();
-        io::stdin().read_line(&mut answer).unwrap();
+📖 How to Play
 
-        if !answer.trim().eq_ignore_ascii_case("y") {
-            break;
-        }
-    }
+Select your preferred difficulty level.
 
-    println!("Thanks for playing!");
-}
+Enter your guesses within the displayed range.
+
+Follow the hints to get closer to the secret number.
+
+Guess correctly before running out of attempts to win!
+
+Choose whether to play another round.
+👨‍💻 Author
+
+Prince
+
+Built with Rust as a fun project to practice programming logic, problem-solving, and command-line application development.
+
+Enjoy the challenge and happy guessing! 🎉
